@@ -1,9 +1,16 @@
 package modele;
 
-public class Position {
+import javafx.scene.image.Image;
+
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+
+public class Position{
     private int nombreDePas = 0;
     private int abscisse;
     private int ordonnee;
+
     public Position (int abscisse, int ordonnee) {
         this.abscisse = abscisse;
         this.ordonnee = ordonnee;
@@ -49,6 +56,6 @@ public class Position {
     }
 
     public String toString() {
-        return ("(" + abscisse + "), Nombre de pas = " + nombreDePas);
+        return ("(" + abscisse + ", " + ordonnee + "), Nombre de pas = " + nombreDePas);
     }
 }

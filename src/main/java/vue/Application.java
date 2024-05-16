@@ -5,9 +5,10 @@ import javafx.scene.layout.HBox;
 import javafx.stage.Stage;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 
 public class Application extends javafx.application.Application {
-    public void start(Stage stage) {
+    public void start(Stage stage) throws FileNotFoundException {
         HBox root = new HBoxRoot();
         Scene scene = new Scene(root, 1800, 950);
         File css = new File("css"+ File.separator+"Canvas.css");
