@@ -1,11 +1,8 @@
-package modele;
+package org.example.entrainement_sae_01_02.modele;
 
-import javafx.scene.image.Image;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-
+/**
+ * La classe Position permet de stocker les coordonnées des objets graphiques comme les temples ou l'apprenti
+ */
 public class Position{
     private int nombreDePas = 0;
     private int abscisse;
@@ -27,10 +24,17 @@ public class Position{
     public void setAbscisse(int abscisse) {
         this.abscisse = abscisse;
     }
+
     public void setNombreDePas(int nombreDePas) {
         this.nombreDePas = nombreDePas;
     }
 
+    /**
+     * Cette méthode permet de changer la position d'une case de la grille
+     * avec comme paramètre une Position vers laquelle se diriger
+     *
+     * @param parPosition La position qu'on cherche à atteindre
+     */
     public void deplacementUneCase (Position parPosition) {
         nombreDePas++;
         if (this.abscisse > parPosition.abscisse) {
