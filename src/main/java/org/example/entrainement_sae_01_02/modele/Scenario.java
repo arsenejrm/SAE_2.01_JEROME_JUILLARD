@@ -13,8 +13,10 @@ import java.util.Scanner;
  */
 public class Scenario implements ConstantesApplication {
     ArrayList <Temple> templesDuScenario;           // Création de la liste des temples. Elle est sous forme d'ArrayList, ce qui signifie que l'ordre des temples définit leur couleur. Si je veux le temple de couleur 4, j'écris "templesDuScenario.get(4);"
+    ArrayList <Temple> templesTriage;
     public Scenario(String fichierScenario) throws FileNotFoundException {      // Prend en paramètre le nom entier du fichier sans son extension. Si le fichier de scénario s'appelle "scenario1.txt", le paramètre fichierScenario devra avoir comme valeur "scenario1".
         templesDuScenario = new ArrayList <>();
+        templesTriage = new ArrayList <>();
         Scanner scanner = new Scanner(new File("scenario" + File.separator + fichierScenario));
         Temple temple;
         while(scanner.hasNext()){                                   // Pour chaque ligne d'un fichier de scénario (c'est-à-dire chaque temple), on les données suivantes séparées par un espace :
@@ -23,10 +25,21 @@ public class Scenario implements ConstantesApplication {
             int couleur = scanner.nextInt();                        // Le numéro représentant la couleur du temple (entre 1 et 9)
             int cristal = scanner.nextInt();                        // Le numéro représentant la couleur du cristal contenu dans le temple (entre 1 et 9)
             temple = new Temple(posX, posY, couleur, cristal);
-            templesDuScenario.add(temple);
+            templesTriage.add(temple);
+        }
+        for (int i = 1; i <= templesTriage.size(); i++) {
+            for (int j = 0; j < templesTriage.size(); j++) {
+                if (templesTriage.get(j).getCouleurTemple() == i) {
+                    templesDuScenario.add(templesTriage.get(j));
+                    break;
+                }
+            }
         }
         for (Temple templeCristal : templesDuScenario) {            // Pour chaque temple, on actualise la position de son cristal de couleur sur la grille par rapport au contenu de chaque temple.
-            templesDuScenario.get(templeCristal.getCouleurTemple() - 1).setPositionCristal(templesDuScenario.get(templeCristal.getCouleurContenu() - 1).getPositionTemple());
+            templesDuScenario.get(templeCristal.getCouleurContenu() - 1).setPositionCristal(templeCristal.getPositionTemple());
+        }
+        for (Temple templeScenario : templesDuScenario) {
+            System.out.println(templeScenario + "\n");
         }
         scanner.close();
     }

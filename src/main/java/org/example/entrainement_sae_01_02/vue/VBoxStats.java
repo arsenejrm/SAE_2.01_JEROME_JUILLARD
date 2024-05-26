@@ -2,6 +2,7 @@ package org.example.entrainement_sae_01_02.vue;
 
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.Label;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 import java.io.File;
@@ -14,6 +15,7 @@ import java.io.File;
 public class VBoxStats extends VBox {
     Label labelScenario = new Label("Scénario");
     ChoiceBox<String> choiceBoxScenario = new ChoiceBox<>();
+    HBox choixSimulation = new HBox();
     public VBoxStats() {
         File [] fichiersScenario = new File("scenario").listFiles();            // On fait la liste des fichiers qui se trouvent dans le dossier "scenario" du projet
         assert fichiersScenario != null;            // On crée une erreur si le dossier est vide
@@ -24,7 +26,8 @@ public class VBoxStats extends VBox {
             }
         }
         choiceBoxScenario.setOnAction(HBoxRoot.getControleur());            // On active la prise en compte des évènements de ce bouton par le contrôleur
-        this.getChildren().addAll(labelScenario, choiceBoxScenario);            // On ajoute le ChoiceBox et son Label sur la vue
+        choixSimulation.getChildren().addAll(labelScenario, choiceBoxScenario);
+        this.getChildren().addAll(choixSimulation);            // On ajoute le ChoiceBox et son Label sur la vue
     }
 
     /**

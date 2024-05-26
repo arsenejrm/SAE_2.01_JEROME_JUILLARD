@@ -71,7 +71,6 @@ public class GrilleOrdonnateur extends VBox implements ConstantesApplication{   
             int ordonnee = (int) event.getY() / CARRE;
             if (abscisse != 0 && ordonnee != 0) {
                 Position positionCliquee = new Position(abscisse, ordonnee);
-                System.out.println(positionCliquee);
                 if (!onActionTimer) {           // S'il n'y a pas de déplacement en cours ...
                     onActionTimer = true;           // ... on désactive la prise en compte des clics utilisateur sur le Canva
                     deplacementAvecTimer(positionApprenti, positionCliquee, labelNombreDePas);          // On lance le déplacement
