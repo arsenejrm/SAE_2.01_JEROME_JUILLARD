@@ -14,9 +14,13 @@ import java.util.Scanner;
 public class Scenario implements ConstantesApplication {
     ArrayList <Temple> templesDuScenario;           // Création de la liste des temples. Elle est sous forme d'ArrayList, ce qui signifie que l'ordre des temples définit leur couleur. Si je veux le temple de couleur 4, j'écris "templesDuScenario.get(4);"
     ArrayList <Temple> templesTriage;
+    ArrayList <Temple> historiqueTemple;
+    boolean estFini;
     public Scenario(String fichierScenario) throws FileNotFoundException {      // Prend en paramètre le nom entier du fichier sans son extension. Si le fichier de scénario s'appelle "scenario1.txt", le paramètre fichierScenario devra avoir comme valeur "scenario1".
         templesDuScenario = new ArrayList <>();
         templesTriage = new ArrayList <>();
+        historiqueTemple = new ArrayList <>();
+        estFini = false;
         Scanner scanner = new Scanner(new File("scenario" + File.separator + fichierScenario));
         Temple temple;
         while(scanner.hasNext()){                                   // Pour chaque ligne d'un fichier de scénario (c'est-à-dire chaque temple), on les données suivantes séparées par un espace :
@@ -38,9 +42,6 @@ public class Scenario implements ConstantesApplication {
         for (Temple templeCristal : templesDuScenario) {            // Pour chaque temple, on actualise la position de son cristal de couleur sur la grille par rapport au contenu de chaque temple.
             templesDuScenario.get(templeCristal.getCouleurContenu() - 1).setPositionCristal(templeCristal.getPositionTemple());
         }
-        for (Temple templeScenario : templesDuScenario) {
-            System.out.println(templeScenario + "\n");
-        }
         scanner.close();
     }
 
@@ -54,8 +55,15 @@ public class Scenario implements ConstantesApplication {
      */
     public void actualiserTemple(GraphicsContext gc, int noTemple) {
         Temple templeActu = templesDuScenario.get(noTemple - 1);
-        gc.drawImage(templeActu.getImageTemple(), (NB_COLONNES / 2 + templeActu.getAbscisseTemple()) * CARRE, (NB_LIGNES / 2 + templeActu.getOrdonneeTemple()) * CARRE, CARRE, CARRE);
-        gc.drawImage(templesDuScenario.get(templeActu.getCouleurContenu() - 1).getImageCristal(), (NB_COLONNES / 2 + templeActu.getAbscisseTemple()) * CARRE, (NB_LIGNES / 2 + templeActu.getOrdonneeTemple()) * CARRE, CARRE, CARRE);
+        gc.drawImage(templeActu.getImageTemple(), templeActu.getPositionGraphiqueTemple().getAbscisse(), templeActu.getPositionGraphiqueTemple().getOrdonnee(), CARRE, CARRE);
+        if (templeActu.getCouleurContenu() != 0) {
+            gc.drawImage(templesDuScenario.get(templeActu.getCouleurContenu() - 1).getImageCristal(), templeActu.getPositionGraphiqueTemple().getAbscisse(), templeActu.getPositionGraphiqueTemple().getOrdonnee(), CARRE, CARRE);
+        }
+    }
+
+    public void actualiserCristal(GraphicsContext gc, int noCristal, Position positionGraphiqueCristal) {
+        Temple templeActu = templesDuScenario.get(noCristal - 1);
+        gc.drawImage(templeActu.getImageCristal(), positionGraphiqueCristal.getAbscisse(), positionGraphiqueCristal.getOrdonnee(), CARRE, CARRE);
     }
 
     /**
@@ -67,5 +75,32 @@ public class Scenario implements ConstantesApplication {
         for (Temple temple : templesDuScenario) {
             this.actualiserTemple(gc, temple.getCouleurTemple());
         }
+    }
+
+    public void ajoutHistorique(Temple temple) {
+        historiqueTemple.add(temple);
+    }
+
+    public boolean finSimulation() {
+        boolean finSimulation = true;
+        for (Temple temple : templesDuScenario) {
+            if (temple.getCouleurContenu() != temple.getCouleurTemple() || estFini) {
+                finSimulation = false;
+                break;
+            }
+        }
+        return finSimulation;
+    }
+
+    public ArrayList <Temple> getHistoriqueTemple() {
+        return historiqueTemple;
+    }
+
+    public boolean getEstFini() {
+        return estFini;
+    }
+
+    public void setEstFini(boolean estFini) {
+        this.estFini = estFini;
     }
 }

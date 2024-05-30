@@ -5,6 +5,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 
+import static org.example.entrainement_sae_01_02.vue.ConstantesApplication.*;
+
 public class Temple {
     /*
     Contient les informations d'un temple et de son cristal,
@@ -28,15 +30,15 @@ public class Temple {
 
     public Position getPositionTemple() { return positionTemple; }
 
-    public int getAbscisseTemple() { return positionTemple.getAbscisse(); }         // Donne l'abscisse de la position du temple sur la grille, on peut aussi l'avoir avec la position emme-même mais c'est pour réduire les longues lignes et améliorer la compréhension.
-
-    public int getOrdonneeTemple() { return positionTemple.getOrdonnee(); }
+    public Position getPositionGraphiqueTemple() {
+        return new Position((NB_LIGNES / 2 + this.getPositionTemple().getAbscisse()) * CARRE, (NB_COLONNES / 2 + this.getPositionTemple().getOrdonnee()) * CARRE);
+    }
 
     public Position getPositionCristal() { return positionCristal; }
 
-    public int getAbscisseCristal() { return positionCristal.getAbscisse(); }
-
-    public int getOrdonneeCristal() { return positionCristal.getOrdonnee(); }
+    public Position getPositionGraphiqueCristal() {
+        return new Position((NB_LIGNES / 2 + this.getPositionCristal().getAbscisse()) * CARRE, (NB_COLONNES / 2 + this.getPositionCristal().getOrdonnee()) * CARRE);
+    }
 
     public int getCouleurTemple() { return couleurTemple; }
 
