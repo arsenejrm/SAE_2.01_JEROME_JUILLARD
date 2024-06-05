@@ -10,8 +10,9 @@ import javafx.scene.layout.VBox;
 
 import org.example.entrainement_sae_01_02.modele.*;
 
-import java.util.Timer;
-import java.util.TimerTask;
+import java.util.*;
+
+import static java.lang.Thread.sleep;
 
 public class GrilleOrdonnateur extends VBox implements ConstantesApplication{           // VBox contenant l'affichage du nombre de pas de l'apprenti ordonnateur et la grille de visualisation de la simulation
 
@@ -20,7 +21,9 @@ public class GrilleOrdonnateur extends VBox implements ConstantesApplication{   
     Scenario scenario;                                                          // Initialisation du scénario de la simulation
     Canvas canvasCarte = new Canvas();                                                                                   // Création du Canvas de la grille d'affichage
     GraphicsContext graphicsContext2D = canvasCarte.getGraphicsContext2D();                                              // Extraction du GraphicsContext du Canvas qui permet de dessiner sur le Canvas
-    boolean onActionTimer = false;                                                                                       // Booléen qui permet de désactiver l'action de déplacement de l'apprenti ordonnateur lorsqu'il est en mouvement
+    public boolean onActionTimer = false;                                                                                       // Booléen qui permet de désactiver l'action de déplacement de l'apprenti ordonnateur lorsqu'il est en mouvement
+    public ArrayList<Position> listePositions;
+    Timer timer;          // On crée un Timer qui nous permet de répéter des actions plusieurs fois
 
     /**
      * Le constructeur crée le Canva, dessine la grille
@@ -71,8 +74,7 @@ public class GrilleOrdonnateur extends VBox implements ConstantesApplication{   
             if (abscisse >= -(NB_LIGNES / 2) + 1 && ordonnee >= -(NB_COLONNES / 2) + 1) {
                 Position positionCliquee = new Position(abscisse, ordonnee);
                 if (!onActionTimer) {           // S'il n'y a pas de déplacement en cours ...
-                    onActionTimer = true;           // ... on désactive la prise en compte des clics utilisateur sur le Canva
-                    deplacementAvecTimer(apprenti, positionCliquee, labelNombreDePas);          // On lance le déplacement
+                    deplacementAvecTimer(positionCliquee, 1);          // On lance le déplacement
                 }
             }
             else {
@@ -89,7 +91,6 @@ public class GrilleOrdonnateur extends VBox implements ConstantesApplication{   
         graphicsContext2D.fillRect((apprenti.getPositionGraphique().getAbscisse()) + 1, apprenti.getPositionGraphique().getOrdonnee() + 1, CARRE - 2, CARRE - 2);           // On "efface" de la même manière l'apprenti ordonnateur
         apprenti = new Apprenti();            // On remet l'apprenti ordonnateur au centre de la grille
         canvasCarte.setOnMouseClicked(null);
-        HBoxRoot.getStats().resetResultat();
     }
 
     /**
@@ -106,44 +107,96 @@ public class GrilleOrdonnateur extends VBox implements ConstantesApplication{   
     /**
      * Cette méthode permet le déplacement de l'apprenti ordonnateur avec
      * un certain délai entre chaque déplacement d'une case à l'autre
-     *
-     * @param apprentiDeplacement L'apprenti qu'on contrôle
-     * @param positionCible La position de destination de l'apprenti ordonnateur
-     * @param labelNombreDePas Le Label qui affiche le nombre de pas parcouru par l'apprenti
      */
-    private void deplacementAvecTimer(Apprenti apprentiDeplacement, Position positionCible, Label labelNombreDePas) {
-        Timer timer = new Timer();          // On crée un Timer qui nous permet de répéter des actions plusieurs fois
+    public void deplacementAvecTimer(Position position, int mode) {
+        onActionTimer = true;
+        Timer timer = new Timer();
         TimerTask timerTask = new TimerTask() {         // On crée une tâche à exécuter qui pourra être répété un certain nombre de fois par le Timer
             @Override
-                public void run() {
-                    graphicsContext2D.setFill(COULEUR_FOND);
-                    graphicsContext2D.fillRect(apprentiDeplacement.getPositionGraphique().getAbscisse() + 1, apprenti.getPositionGraphique().getOrdonnee() + 1, CARRE - 2, CARRE - 2);           // On recouvre le dessin actuel de l'apprenti
-                    for (Temple temple : scenario.getTemples()) {           // On check les coordonnées des temples du scénario
-                        if (apprentiDeplacement.getPosition().equals(temple.getPositionTemple())) {
-                            scenario.actualiserTemple(graphicsContext2D, temple.getCouleurTemple());            // Si un temple s'est fait recouvrir par le carré de masquage de l'apprenti, on le redessine
-                            scenario.ajoutHistorique(temple);
+            public void run() {
+                graphicsContext2D.setFill(COULEUR_FOND);
+                graphicsContext2D.fillRect(apprenti.getPositionGraphique().getAbscisse() + 1, apprenti.getPositionGraphique().getOrdonnee() + 1, CARRE - 2, CARRE - 2);
+                for (Temple temple : scenario.getTemples()) {           // On check les coordonnées des temples du scénario
+                    if (apprenti.getPosition().equals(temple.getPositionTemple())) {
+                        scenario.actualiserTemple(graphicsContext2D, temple.getCouleurTemple());            // Si un temple s'est fait recouvrir par le carré de masquage de l'apprenti, on le redessine
+                        scenario.ajoutHistorique(temple);
+                    }
+                }
+                apprenti.getPosition().deplacementUneCase(position);         // On actualise les coordonnées de l'apprenti
+                afficheGrille();
+                Platform.runLater(() -> {
+                    labelNombreDePas.setText("Nombre de pas : " + apprenti.getPosition().getNombreDePas());
+                });
+                if (apprenti.getPosition().equals(position)) {
+                    timer.cancel();
+                    if (templeDetecte(apprenti.getPosition().getAbscisse(), apprenti.getPosition().getOrdonnee())) {
+                        int idtemple = getCouleurTemple(apprenti.getPosition().getAbscisse(), apprenti.getPosition().getOrdonnee());
+                        if (apprenti.getContenu() > 0) {
+                            if (scenario.getTemple(idtemple).getCouleurContenu() > 0) {
+                                HBoxRoot.getControleur().echangerCristal();
+                            } else {
+                                HBoxRoot.getControleur().poserCristal();
+                            }
+                        } else {
+                            HBoxRoot.getControleur().prendreCristal();
                         }
                     }
-                    apprentiDeplacement.getPosition().deplacementUneCase(positionCible);         // On actualise les coordonnées de l'apprenti
-                    graphicsContext2D.setFill(COULEUR_APPRENTI);
-                    graphicsContext2D.fillOval(apprentiDeplacement.getPositionGraphique().getAbscisse() + CARRE/8,          // On se sert des coordonnées actualisées pour dessiner l'apprenti à son nouvel emplacement
-                            apprentiDeplacement.getPositionGraphique().getOrdonnee() + CARRE/4, LARGEUR_OVALE, HAUTEUR_OVALE);
-                    if (apprentiDeplacement.getContenu() != 0) {
-                        scenario.getTemples().get(apprentiDeplacement.getContenu() - 1).setPositionCristal(apprentiDeplacement.getPosition());
-                        scenario.actualiserCristal(graphicsContext2D, apprentiDeplacement.getContenu(), apprentiDeplacement.getPositionGraphique());
+                    if (mode == 1) {
+                        onActionTimer = false;
                     }
-                    if (apprentiDeplacement.getPosition().equals(positionCible)) {
-                        onActionTimer = false;         // Une fois que l'apprenti a atteint sa destination, on réactive la prise en compte d'un clic de l'utilisateur sur un carré et on désactive le timer
-                        timer.cancel();
+                    else if (mode == 2) {
+                        scenario.getScenarioAlgorithmes().etape_suivante();
+                        if (scenario.getScenarioAlgorithmes().getEtape() == 1) {
+                            deplacementAvecTimer(scenario.getScenarioAlgorithmes().getPosition2(), 2);
+                        } else if (scenario.getScenarioAlgorithmes().getEtape() == 2) {
+                            deplacementAvecTimer(scenario.getScenarioAlgorithmes().getPosition1(), 2);
+                        } else if (scenario.getScenarioAlgorithmes().getEtape() == 3) {
+                            TreeMap<Integer, Temple> temple_restant = new TreeMap<>();
+                            for (Temple temple : scenario.getTemples()) {
+                                if (temple.getCouleurTemple() != temple.getCouleurContenu()) {
+                                    temple_restant.put(temple.getCouleurTemple(), temple);
+                                }
+                            }
+                            if (!temple_restant.isEmpty()) {
+                                scenario.algorithmeTriSelection();
+                            }
+                            else {
+                                onActionTimer = false;
+                            }
+                        }
                     }
-                    Platform.runLater(() -> {
-                        labelNombreDePas.setText("Nombre de pas : " + apprentiDeplacement.getPosition().getNombreDePas());
-                    });
+                }
             }
         };
-        timer.scheduleAtFixedRate(timerTask, 250, 250);         // On ajoute la tâche au timer pour qu'elle soit exécutée à chaque occurence
+        timer.scheduleAtFixedRate(timerTask, 50, 50);         // On ajoute la tâche au timer pour qu'elle soit exécutée à chaque occurence
     }
-
+    public void afficheGrille(){
+        graphicsContext2D.setFill(COULEUR_APPRENTI);
+        graphicsContext2D.fillOval(apprenti.getPositionGraphique().getAbscisse() + CARRE/8,          // On se sert des coordonnées actualisées pour dessiner l'apprenti à son nouvel emplacement
+                apprenti.getPositionGraphique().getOrdonnee() + CARRE/4, LARGEUR_OVALE, HAUTEUR_OVALE);
+        if (apprenti.getContenu() != 0) {
+            scenario.getTemples().get(apprenti.getContenu() - 1).setPositionCristal(apprenti.getPosition());
+            scenario.actualiserCristal(graphicsContext2D, apprenti.getContenu(), apprenti.getPositionGraphique());
+        }
+    }
+    private boolean templeDetecte(int x, int y) {
+        for (Temple temple : scenario.getTemples()) {
+            Position position = temple.getPositionTemple();
+            if (position.getAbscisse() == x && position.getOrdonnee() == y) {
+                return true;
+            }
+        }
+        return false;
+    }
+    private int getCouleurTemple(int x, int y) {
+        for (Temple temple : scenario.getTemples()) {
+            Position position = temple.getPositionTemple();
+            if (position.getAbscisse() == x && position.getOrdonnee() == y) {
+                return temple.getCouleurTemple();
+            }
+        }
+        return 0;
+    }
     public GraphicsContext getGraphicsContext2D() {
         return graphicsContext2D;
     }
@@ -158,5 +211,9 @@ public class GrilleOrdonnateur extends VBox implements ConstantesApplication{   
 
     public boolean isOnActionTimer() {
         return onActionTimer;
+    }
+
+    public Label getLabelNombreDePas() {
+        return labelNombreDePas;
     }
 }

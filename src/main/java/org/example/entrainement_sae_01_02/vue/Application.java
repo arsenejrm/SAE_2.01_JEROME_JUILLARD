@@ -13,7 +13,7 @@ import java.io.FileNotFoundException;
 public class Application extends javafx.application.Application {
     public void start(Stage stage) {
         HBox root = new HBoxRoot();
-        Scene scene = new Scene(root, 1800, 950);
+        Scene scene = new Scene(root, 1300, 820);
         File css = new File("css"+ File.separator+"Canvas.css");
         scene.getStylesheets().add(css.toURI().toString());
         stage.setScene(scene);

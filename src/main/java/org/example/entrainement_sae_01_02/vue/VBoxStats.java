@@ -22,13 +22,7 @@ public class VBoxStats extends VBox {
     ChoiceBox<String> choiceBoxScenario = new ChoiceBox<>();
     HBox choixSimulation = new HBox();
     HBox actionSimulation = new HBox();
-    Button prendreCristal = new Button("Prendre");
-    Button echangerCristal = new Button("Echanger");
-    Button poserCristal = new Button("Poser");
-    VBox resultatSimulation = new VBox();
-    Label labelResultat;
-    ScrollPane scrollHistorique;
-    VBox stockHistorique;
+    Button triSelection = new Button("Trier par sélection");
     public VBoxStats() {
         File [] fichiersScenario = new File("scenario").listFiles();            // On fait la liste des fichiers qui se trouvent dans le dossier "scenario" du projet
         assert fichiersScenario != null;            // On crée une erreur si le dossier est vide
@@ -41,12 +35,9 @@ public class VBoxStats extends VBox {
         choiceBoxScenario.setOnAction(HBoxRoot.getControleur());            // On active la prise en compte des évènements de ce bouton par le contrôleur
         choixSimulation.getChildren().addAll(labelScenario, choiceBoxScenario);
         VBox.setMargin(choixSimulation, new Insets(50, 0, 0, 20));
-        prendreCristal.setOnAction(HBoxRoot.getControleur());
-        echangerCristal.setOnAction(HBoxRoot.getControleur());
-        poserCristal.setOnAction(HBoxRoot.getControleur());
-        actionSimulation.getChildren().addAll(prendreCristal, echangerCristal, poserCristal);
-        VBox.setMargin(actionSimulation, new Insets(100, 0, 0, 50));
-        this.getChildren().addAll(choixSimulation, actionSimulation, resultatSimulation);            // On ajoute le ChoiceBox et son Label sur la vue
+        VBox.setMargin(actionSimulation, new Insets(50, 0, 0, 20));
+        triSelection.setOnAction(HBoxRoot.getControleur());
+        this.getChildren().addAll(choixSimulation, triSelection);            // On ajoute le ChoiceBox et son Label sur la vue
     }
 
     /**
@@ -62,23 +53,5 @@ public class VBoxStats extends VBox {
 
     public void setChoixScenario(String choixValeur) {
         this.choiceBoxScenario.setValue(choixValeur);
-    }
-
-    public void finScenario() {
-        labelResultat = new Label("Résultat de la simulation");
-        scrollHistorique = new ScrollPane();
-        ArrayList<Temple> historiqueTemples = HBoxRoot.getGrille().getScenario().getHistoriqueTemple();
-        stockHistorique = new VBox();
-        Label templeHistorique;
-        for (int i = 1; i < historiqueTemples.size(); i++) {
-            templeHistorique = new Label(i + " : Temple de couleur " + historiqueTemples.get(i).getCouleurTemple());
-            stockHistorique.getChildren().add(templeHistorique);
-        }
-        scrollHistorique.setContent(stockHistorique);
-        resultatSimulation.getChildren().addAll(labelResultat, scrollHistorique);
-    }
-
-    public void resetResultat() {
-        resultatSimulation.getChildren().clear();
     }
 }

@@ -55,6 +55,24 @@ public class Position{
         }
     }
 
+    public int distanceTo(Position parPosition) {
+        int resultatX;
+        int resultatY;
+        if (this.abscisse >= parPosition.abscisse) {
+            resultatX = this.abscisse - parPosition.abscisse;
+        }
+        else {
+            resultatX = parPosition.abscisse - this.abscisse;
+        }
+        if (this.ordonnee >= parPosition.ordonnee) {
+            resultatY = this.ordonnee- parPosition.ordonnee;
+        }
+        else {
+            resultatY = parPosition.ordonnee- this.ordonnee;
+        }
+        return resultatX + resultatY;
+    }
+
     public boolean equals(Position parPosition) {
         return (this.ordonnee == parPosition.ordonnee && this.abscisse == parPosition.abscisse);
     }

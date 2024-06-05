@@ -31,6 +31,6 @@ public class Apprenti {
     }
 
     public void afficher(GraphicsContext gc) {
-        gc.fillOval(this.getPositionGraphique().getAbscisse() + CARRE/8, this.getPositionGraphique().getOrdonnee() + CARRE/4, LARGEUR_OVALE, HAUTEUR_OVALE);
+        gc.fillOval(this.getPositionGraphique().getAbscisse() + CARRE /8, this.getPositionGraphique().getOrdonnee() + CARRE /4, LARGEUR_OVALE, HAUTEUR_OVALE);
     }
 }

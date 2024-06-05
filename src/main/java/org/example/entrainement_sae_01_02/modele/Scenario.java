@@ -2,6 +2,8 @@ package org.example.entrainement_sae_01_02.modele;
 
 import javafx.scene.canvas.GraphicsContext;
 import org.example.entrainement_sae_01_02.vue.ConstantesApplication;
+import org.example.entrainement_sae_01_02.vue.HBoxRoot;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -15,11 +17,15 @@ public class Scenario implements ConstantesApplication {
     ArrayList <Temple> templesDuScenario;           // Création de la liste des temples. Elle est sous forme d'ArrayList, ce qui signifie que l'ordre des temples définit leur couleur. Si je veux le temple de couleur 4, j'écris "templesDuScenario.get(4);"
     ArrayList <Temple> templesTriage;
     ArrayList <Temple> historiqueTemple;
+    ArrayList <Integer> algoTemples;
+    Algorithmes scenarioAlgorithmes;
     boolean estFini;
+    public Algorithmes getScenarioAlgorithmes(){return scenarioAlgorithmes;}
     public Scenario(String fichierScenario) throws FileNotFoundException {      // Prend en paramètre le nom entier du fichier sans son extension. Si le fichier de scénario s'appelle "scenario1.txt", le paramètre fichierScenario devra avoir comme valeur "scenario1".
         templesDuScenario = new ArrayList <>();
         templesTriage = new ArrayList <>();
         historiqueTemple = new ArrayList <>();
+        algoTemples = new ArrayList <>();
         estFini = false;
         Scanner scanner = new Scanner(new File("scenario" + File.separator + fichierScenario));
         Temple temple;
@@ -35,17 +41,21 @@ public class Scenario implements ConstantesApplication {
             for (int j = 0; j < templesTriage.size(); j++) {
                 if (templesTriage.get(j).getCouleurTemple() == i) {
                     templesDuScenario.add(templesTriage.get(j));
-                    break;
+                    algoTemples.add(templesTriage.get(j).getCouleurContenu());
                 }
             }
         }
+        scanner.close();
         for (Temple templeCristal : templesDuScenario) {            // Pour chaque temple, on actualise la position de son cristal de couleur sur la grille par rapport au contenu de chaque temple.
             templesDuScenario.get(templeCristal.getCouleurContenu() - 1).setPositionCristal(templeCristal.getPositionTemple());
         }
-        scanner.close();
+        scenarioAlgorithmes = new Algorithmes(this);
     }
 
     public ArrayList <Temple> getTemples() { return templesDuScenario; }
+    public Temple getTemple(int i){
+        return templesDuScenario.get(i-1);
+    }
 
     /**
      * Cette méthode permet de redessiner l'image d'un temple et de son contenu sur le Canva
@@ -102,5 +112,10 @@ public class Scenario implements ConstantesApplication {
 
     public void setEstFini(boolean estFini) {
         this.estFini = estFini;
+    }
+
+    public void algorithmeTriSelection(){
+        scenarioAlgorithmes.majPosition(this);
+        HBoxRoot.getGrille().deplacementAvecTimer(scenarioAlgorithmes.getPosition1(), 2);
     }
 }

@@ -24,7 +24,7 @@ public class Controleur implements EventHandler {           // L'implémentation
                         HBoxRoot.getGrille().changeScenario(scenarioSelection);         // sinon on efface les temples précédents et la position de l'apprenti avant de charger le nouveau scénario
                     }
                 } catch (Exception e) {
-                    System.out.println("Erreur Scenario: " + e.getMessage());
+                    System.out.println("Erreur Scenario : " + e.getMessage());
                 }
             }
             else {
@@ -32,77 +32,81 @@ public class Controleur implements EventHandler {           // L'implémentation
                 System.out.println("Le scénario ne peut pas être changé tant qu'un déplacement est en cours");
             }
         }
-        if (HBoxRoot.getGrille().getScenario() != null && !HBoxRoot.getGrille().isOnActionTimer()) {
-            if (event.getSource() instanceof Button && ((Button) event.getSource()).getText().equals("Prendre")) {
-                if (HBoxRoot.getGrille().getApprenti().getContenu() == 0) {
-                    for (Temple temple : HBoxRoot.getGrille().getScenario().getTemples()) {
-                        if (HBoxRoot.getGrille().getApprenti().getPosition().equals(temple.getPositionTemple())) {
-                            HBoxRoot.getGrille().getScenario().actualiserCristal(HBoxRoot.getGrille().getGraphicsContext2D(), temple.getCouleurContenu(), temple.getPositionGraphiqueTemple());
-                            HBoxRoot.getGrille().getApprenti().setContenu(temple.getCouleurContenu());
-                            temple.setCouleurContenu(0);
-                            break;
-                        }
-                    }
-                }
-                else {
-                    System.out.println("L'apprenti possède déjà un cristal !");
-                }
+        if (event.getSource() instanceof Button && ((Button) event.getSource()).getText().equals("Trier par sélection")) {
+            if (!HBoxRoot.getGrille().isOnActionTimer() && HBoxRoot.getGrille().getScenario() != null && !HBoxRoot.getGrille().getScenario().getEstFini()) {
+                HBoxRoot.getGrille().getScenario().algorithmeTriSelection();
             }
-            if (event.getSource() instanceof Button && ((Button) event.getSource()).getText().equals("Echanger")) {
-                if (HBoxRoot.getGrille().getApprenti().getContenu() != 0) {
-                    boolean cristalTemple = false;
-                    for (Temple temple : HBoxRoot.getGrille().getScenario().getTemples()) {
-                        if (HBoxRoot.getGrille().getApprenti().getPosition().equals(temple.getPositionTemple())) {
-                            if (temple.getCouleurContenu() == 0) {
-                                cristalTemple = true;
-                                break;
-                            }
-                            int contenuApprenti = HBoxRoot.getGrille().getApprenti().getContenu();
-                            HBoxRoot.getGrille().getScenario().actualiserCristal(HBoxRoot.getGrille().getGraphicsContext2D(), temple.getCouleurContenu(), temple.getPositionGraphiqueTemple());
-                            HBoxRoot.getGrille().getApprenti().setContenu(temple.getCouleurContenu());
-                            temple.setCouleurContenu(contenuApprenti);
-                            break;
-                        }
-                    }
-                    if (cristalTemple) {
-                        System.out.println("Le temple n'a pas de cristal !");
-                    }
-                }
-                else {
-                    System.out.println("L'apprenti n'a pas de cristal !");
-                }
+            else {
+                System.out.println("Tu ne peux pas déclencher un algorithme de tri maintenant !");
             }
-            if (event.getSource() instanceof Button && ((Button) event.getSource()).getText().equals("Poser")) {
-                if (HBoxRoot.getGrille().getApprenti().getContenu() != 0) {
-                    boolean cristalTemple = true;
-                    for (Temple temple : HBoxRoot.getGrille().getScenario().getTemples()) {
-                        if (HBoxRoot.getGrille().getApprenti().getPosition().equals(temple.getPositionTemple())) {
-                            if (temple.getCouleurContenu() != 0) {
-                                cristalTemple = false;
-                                break;
-                            }
-                            temple.setCouleurContenu(HBoxRoot.getGrille().getApprenti().getContenu());
-                            HBoxRoot.getGrille().getApprenti().setContenu(0);
-                            HBoxRoot.getGrille().getApprenti().afficher(HBoxRoot.getGrille().getGraphicsContext2D());
-                            break;
-                        }
-                    }
-                    if (!cristalTemple) {
-                        System.out.println("Le temple a déjà un cristal !");
-                    }
-                }
-                else {
-                    System.out.println("L'apprenti n'a pas de cristal !");
-                }
-                if (HBoxRoot.getGrille().getScenario().finSimulation()) {
-                    HBoxRoot.getStats().finScenario();
-                    HBoxRoot.getGrille().getScenario().setEstFini(true);
-                    HBoxRoot.getGrille().scenarioOff();
+        }
+    }
+
+    public void prendreCristal() {
+        if (HBoxRoot.getGrille().getApprenti().getContenu() == 0) {
+            for (Temple temple : HBoxRoot.getGrille().getScenario().getTemples()) {
+                if (HBoxRoot.getGrille().getApprenti().getPosition().equals(temple.getPositionTemple())) {
+                    HBoxRoot.getGrille().getScenario().actualiserCristal(HBoxRoot.getGrille().getGraphicsContext2D(), temple.getCouleurContenu(), temple.getPositionGraphiqueTemple());
+                    HBoxRoot.getGrille().getApprenti().setContenu(temple.getCouleurContenu());
+                    temple.setCouleurContenu(0);
+                    break;
                 }
             }
         }
         else {
-            System.out.println("Attender la fin du déplacement du joueur avant de toucher à son contenu !");
+            System.out.println("L'apprenti possède déjà un cristal !");
+        }
+    }
+
+    public void echangerCristal() {
+        if (HBoxRoot.getGrille().getApprenti().getContenu() != 0) {
+            boolean cristalTemple = false;
+            for (Temple temple : HBoxRoot.getGrille().getScenario().getTemples()) {
+                if (HBoxRoot.getGrille().getApprenti().getPosition().equals(temple.getPositionTemple())) {
+                    if (temple.getCouleurContenu() == 0) {
+                        cristalTemple = true;
+                        break;
+                    }
+                    int contenuApprenti = HBoxRoot.getGrille().getApprenti().getContenu();
+                    HBoxRoot.getGrille().getScenario().actualiserCristal(HBoxRoot.getGrille().getGraphicsContext2D(), temple.getCouleurContenu(), temple.getPositionGraphiqueTemple());
+                    HBoxRoot.getGrille().getApprenti().setContenu(temple.getCouleurContenu());
+                    temple.setCouleurContenu(contenuApprenti);
+                    break;
+                }
+            }
+            if (cristalTemple) {
+                System.out.println("Le temple n'a pas de cristal !");
+            }
+        }
+        else {
+            System.out.println("L'apprenti n'a pas de cristal !");
+        }
+    }
+
+    public void poserCristal() {
+        if (HBoxRoot.getGrille().getApprenti().getContenu() != 0) {
+            boolean cristalTemple = true;
+            for (Temple temple : HBoxRoot.getGrille().getScenario().getTemples()) {
+                if (HBoxRoot.getGrille().getApprenti().getPosition().equals(temple.getPositionTemple())) {
+                    if (temple.getCouleurContenu() != 0) {
+                        cristalTemple = false;
+                        break;
+                    }
+                    temple.setCouleurContenu(HBoxRoot.getGrille().getApprenti().getContenu());
+                    HBoxRoot.getGrille().getApprenti().setContenu(0);
+                    HBoxRoot.getGrille().getApprenti().afficher(HBoxRoot.getGrille().getGraphicsContext2D());
+                    break;
+                }
+            }
+            if (!cristalTemple) {
+                System.out.println("Le temple a déjà un cristal !");
+            }
+        }
+        else {
+            System.out.println("L'apprenti n'a pas de cristal !");
+        }
+        if (HBoxRoot.getGrille().getScenario().finSimulation()) {
+            HBoxRoot.getGrille().getScenario().setEstFini(true);
         }
     }
 }
